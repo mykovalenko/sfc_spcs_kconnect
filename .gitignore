@@ -1,0 +1,17 @@
+# Packages #
+############
+*.gz
+
+# Logs and databases #
+######################
+*.log
+
+# OS generated files #
+######################
+._*
+.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

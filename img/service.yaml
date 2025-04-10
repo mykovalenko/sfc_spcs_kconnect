@@ -1,0 +1,20 @@
+spec:
+  containers:
+    - name: app-&{ depname }
+      image: &{ accname }.registry.snowflakecomputing.com/&{ dbsname }/&{ depname }/images/app-&{ depname }:latest
+      volumeMounts:
+        - name: volume-stage
+          mountPath: /opt/spcs/stage/
+  endpoints:
+    - name: app-&{ depname }
+      port: 8084
+      public: true
+  volumes:
+    - name: volume-stage
+      source: "@volumes"
+      uid: 1000
+      gid: 1000
+serviceRoles:
+  - name: APP_&{ depname }_AXSROLE
+    endpoints:
+    - app-&{ depname }
