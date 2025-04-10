@@ -14,7 +14,7 @@ snow_setup: snow_reset
 	snow sql -c $(CNX_NAME) -f dbs/setup.sql -D "depname=$(DEP_NAME)" -D "dbsname=$(DBS_NAME)" -D "hubname=$(HUB_NAME)" > log/setup_$(TMS_EXEC).log 2>&1
 
 snow_add01: snow_setup
-	snow sql -c $(CNX_NAME) -f dbs/setkey.sql -D "appname=$(APP_NAME)" -D "dbsname=$(DBS_NAME)" > log/setkey_$(TMS_EXEC).log 2>&1
+	snow sql -c $(CNX_NAME) -f dbs/setkey.sql -D "depname=$(DEP_NAME)" -D "dbsname=$(DBS_NAME)" > log/setkey_$(TMS_EXEC).log 2>&1
 
 snow_login: snow_add01
 	snow spcs image-registry token --connection $(CNX_NAME) --format=JSON | sudo docker login $(ACC_NAME).registry.snowflakecomputing.com --username 0sessiontoken --password-stdin
