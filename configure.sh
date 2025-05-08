@@ -35,6 +35,9 @@ DBSNAME=$(echo "${DBSNAME:-'apps'}" | tr '[:upper:]' '[:lower:]')
 read -p "Provide target table name (created automatically): " TBLNAME
 TBLNAME=$(echo "${TBLNAME:-'messages'}" | tr '[:upper:]' '[:lower:]')
 
+read -p "Is target an Iceberg table (n): " ICEFLAG
+ICEFLAG=$(echo "${ICEFLAG:-'n'}" | tr '[:upper:]' '[:lower:]')
+
 read -r -p "Proceed building the deployment? [Y/n]: " response
 case "${response}" in
     [nN][oO]|[nN]) 
@@ -59,6 +62,12 @@ mkdir -p "${BASEDIR}/cfg"
 cp -rf ./etc/* "${BASEDIR}"
 cp -rf ./img "${BASEDIR}"
 cp -rf ./dbs "${BASEDIR}"
+
+if [ "_"$ICEFLAG == "_y" ]; then
+	mv ${BASEDIR}/img/snowflake_iceberg.properties ${BASEDIR}/img/snowflake.properties
+else
+	rm ${BASEDIR}/img/snowflake_iceberg.properties
+fi
 
 cd ${BASEDIR}
 

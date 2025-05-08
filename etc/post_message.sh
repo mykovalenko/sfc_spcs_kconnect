@@ -1,4 +1,4 @@
-MESSAGE="{\"timestamp\": \"$(date '+%Y-%m-%d %H:%M:%S')\", \"message\": \"${1}\"}"
+MESSAGE="{\"tms\": \"$(date '+%Y-%m-%d %H:%M:%S')\", \"id\": $RANDOM, \"wc\":$(echo \"$1\" | wc -w), \"msg\": \"${1}\"}"
 TOPIC_NAME="&{ topname }"
 EVENTHUB_URI="&{ hubname }.servicebus.windows.net"
 SHARED_ACCESS_KEY_NAME="&{ keyname }"
