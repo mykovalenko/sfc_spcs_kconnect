@@ -35,8 +35,21 @@ DBSNAME=$(echo "${DBSNAME:-'apps'}" | tr '[:upper:]' '[:lower:]')
 read -p "Provide target table name (created automatically): " TBLNAME
 TBLNAME=$(echo "${TBLNAME:-'messages'}" | tr '[:upper:]' '[:lower:]')
 
-read -p "Is target an Iceberg table (n): " ICEFLAG
-ICEFLAG=$(echo "${ICEFLAG:-'n'}" | tr '[:upper:]' '[:lower:]')
+read -p "Is target an Iceberg table (false): " ICEFLAG
+ICEFLAG=$(echo "${ICEFLAG:-'false'}" | tr '[:upper:]' '[:lower:]')
+
+if [ "_"$ICEFLAG != "_true" ]; then
+	ICEFLAG='false'
+else
+	echo "You must manually create ICEBERG table after deployment:"
+	echo ""
+	echo "GRANT USAGE ON EXTERNAL VOLUME <volume_name> TO ROLE APP_${DEPNAME}_OWNER;"
+	echo "CREATE OR REPLACE ICEBERG TABLE ${DBSNAME}.${DEPNAME}.${TBLNAME}(RECORD_METADATA OBJECT())"
+	echo "    EXTERNAL_VOLUME = '<volume_name>'"
+	echo "    BASE_LOCATION = '<path/location/on/volume/storage>'"
+	echo "    CATALOG = 'SNOWFLAKE';"
+	echo "ALTER ICEBERG TABLE ${DBSNAME}.${DEPNAME}.${TBLNAME} SET ENABLE_SCHEMA_EVOLUTION = TRUE;"
+fi
 
 read -r -p "Proceed building the deployment? [Y/n]: " response
 case "${response}" in
@@ -62,12 +75,6 @@ mkdir -p "${BASEDIR}/cfg"
 cp -rf ./etc/* "${BASEDIR}"
 cp -rf ./img "${BASEDIR}"
 cp -rf ./dbs "${BASEDIR}"
-
-if [ "_"$ICEFLAG == "_y" ]; then
-	mv ${BASEDIR}/img/snowflake_iceberg.properties ${BASEDIR}/img/snowflake.properties
-else
-	rm ${BASEDIR}/img/snowflake_iceberg.properties
-fi
 
 cd ${BASEDIR}
 
@@ -99,6 +106,7 @@ sed -i "s|&{ keypass }|${KEYPASS}|g" ${BASEDIR}/img/eventhub.properties
 
 sed -i "s|&{ topname }|${TOPNAME}|g" ${BASEDIR}/img/snowflake.properties
 sed -i "s|&{ tblname }|${TBLNAME}|g" ${BASEDIR}/img/snowflake.properties
+sed -i "s|&{ iceflag }|${ICEFLAG}|g" ${BASEDIR}/img/snowflake.properties
 sed -i "s|&{ accname }|${ORGNAME}-${ACCALIAS}|g" ${BASEDIR}/img/snowflake.properties
 sed -i "s|&{ dbsname }|${DBSNAME}|g" ${BASEDIR}/img/snowflake.properties
 sed -i "s|&{ xmaname }|${DEPNAME}|g" ${BASEDIR}/img/snowflake.properties
